@@ -1,0 +1,173 @@
+{% comment %}
+=== NEW TEMPLATE LOADED (NO ENDWITH) ===
+If you can see this file in editor but Django still errors with endwith,
+then you're not editing the same file Django is rendering.
+{% endcomment %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ biz.name }} • Nearify</title>
+
+  <style>
+    :root{ --primary:#4f46e5; --bg:#f4f6f8; --card:#fff; --muted:#6b7280; --radius:14px; }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui;background:var(--bg);color:#111}
+    .wrap{max-width:860px;margin:28px auto;padding:0 16px}
+    .card{background:var(--card);border-radius:var(--radius);box-shadow:0 10px 24px rgba(0,0,0,.08);overflow:hidden}
+    .hero{display:flex;gap:18px;padding:18px}
+    .img{width:140px;height:140px;border-radius:16px;flex:0 0 140px;background:#e5e7eb;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+    .img img{width:100%;height:100%;object-fit:cover}
+    h1{margin:0 0 6px 0;font-size:24px}
+    .rating{color:#f59e0b;font-size:14px;margin:6px 0}
+    .meta{color:var(--muted);font-size:14px;line-height:1.6}
+    .badges{margin-top:8px;display:flex;gap:8px;flex-wrap:wrap}
+    .badge{font-size:12px;padding:4px 10px;border-radius:999px;background:#eef2ff;color:#3730a3}
+    .badge.gold{background:#fff7cc;color:#8a6b00}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;padding:0 18px 18px}
+    .btn{border:none;border-radius:10px;padding:10px 14px;cursor:pointer;background:var(--primary);color:#fff;font-weight:600;text-decoration:none;display:inline-block}
+    .btn.secondary{background:#111}
+    .btn.light{background:#e5e7eb;color:#111}
+    .section{padding:18px;border-top:1px solid #eee}
+    a{color:inherit}
+    @media (max-width:640px){ .hero{flex-direction:column} .img{width:100%;height:220px;flex:auto} }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <a href="/finder/" style="color:var(--muted);text-decoration:none;">← Back to search</a>
+
+    <div class="card" style="margin-top:12px;">
+      <div class="hero">
+        <div class="img">
+          {% if biz.image_url %}
+            <img src="{{ biz.image_url }}" alt="{{ biz.name }}">
+          {% elif biz.image %}
+            <img src="{{ biz.image.url }}" alt="{{ biz.name }}">
+          {% else %}
+            <span style="color:#6b7280;">No Image</span>
+          {% endif %}
+        </div>
+
+        <div style="flex:1;">
+          <h1>{{ biz.name }}</h1>
+
+          <div class="rating">
+            {% for _ in stars.full %}★{% endfor %}
+            {% if stars.half %}⯨{% endif %}
+            {% for _ in stars.empty %}☆{% endfor %}
+            ({{ biz.rating|default:0 }}) • {{ biz.review_count|default:0 }} reviews
+          </div>
+
+          <div class="meta">
+            {% if biz.address or biz.city or biz.state or biz.zip_code %}
+              📍
+              <a href="https://www.google.com/maps/search/?api=1&query={{ biz.address|default_if_none:'' }}%2C%20{{ biz.city|default_if_none:'' }}%2C%20{{ biz.state|default_if_none:'' }}%20{{ biz.zip_code|default_if_none:'' }}"
+                 target="_blank" rel="noopener">
+                {{ biz.address|default_if_none:"" }}, {{ biz.city|default_if_none:"" }}, {{ biz.state|default_if_none:"" }} {{ biz.zip_code|default_if_none:"" }}
+              </a>
+              <br>
+            {% endif %}
+
+            {% if biz.phone %}📞 {{ biz.phone }}{% else %}📞 N/A{% endif %}
+            <br>
+
+            {% if biz.open_time and biz.close_time %}
+              <b>Hours:</b> {{ biz.open_time|time:"g:i A" }} - {{ biz.close_time|time:"g:i A" }}
+            {% endif %}
+          </div>
+
+          <div class="badges">
+            {% if biz.is_active %}
+              <span class="badge gold">PROMOTED: {{ biz.plan|upper }}</span>
+            {% endif %}
+            {% if biz.is_on_holiday %}
+              <span class="badge gold">🏖 ON HOLIDAY{% if biz.holiday_note %}: {{ biz.holiday_note }}{% endif %}</span>
+            {% endif %}
+            {% if biz.category %}
+              <span class="badge">{{ biz.category }}</span>
+            {% endif %}
+          </div>
+
+          <div class="actions">
+            <a class="btn"
+               href="https://www.google.com/maps/dir/?api=1&destination={{ biz.address|default_if_none:'' }}%2C%20{{ biz.city|default_if_none:'' }}%2C%20{{ biz.state|default_if_none:'' }}%20{{ biz.zip_code|default_if_none:'' }}"
+               target="_blank" rel="noopener"
+               onclick="track('dir')">
+              Navigate (Google Maps)
+            </a>
+
+            {% if biz.phone %}
+              <a class="btn light" href="tel:{{ biz.phone }}" onclick="track('call')">Call Now</a>
+            {% endif %}
+
+            {% if biz.url %}
+              <a class="btn light" href="{{ biz.url }}" target="_blank" rel="noopener" onclick="track('web')">
+                Visit Website
+              </a>
+            {% endif %}
+
+            {% if user.is_authenticated and biz.owner_id == user.id %}
+              <a class="btn secondary" href="{% url 'dashboard' %}">Dashboard</a>
+            {% endif %}
+          </div>
+
+          <div class="section">
+            <h3 style="margin:0 0 8px 0;">Business details</h3>
+            <div class="meta">
+              <b>Name:</b> {{ biz.name }}<br>
+              <b>Category:</b> {{ biz.category|default:"N/A" }}<br>
+              <b>Address:</b> {{ biz.address|default_if_none:"" }}, {{ biz.city|default_if_none:"" }}, {{ biz.state|default_if_none:"" }} {{ biz.zip_code|default_if_none:"" }}<br>
+              <b>Phone:</b> {{ biz.phone|default:"N/A" }}<br>
+              {% if biz.open_time and biz.close_time %}
+                <b>Hours:</b> {{ biz.open_time|time:"g:i A" }} - {{ biz.close_time|time:"g:i A" }}<br>
+              {% endif %}
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function getCookie(name) {
+      let cookieValue = null;
+      if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+          const cookie = cookies[i].trim();
+          if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+          }
+        }
+      }
+      return cookieValue;
+    }
+    const csrftoken = getCookie('csrftoken');
+
+    function track(kind) {
+      const id = "{{ biz.id }}";
+      let url = "";
+      if (kind === "call") url = `/finder/business/${id}/track/call/`;
+      if (kind === "web")  url = `/finder/business/${id}/track/web/`;
+      if (kind === "dir")  url = `/finder/business/${id}/track/dir/`;
+      if (!url) return;
+      fetch(url, { method: "POST", headers: { "X-CSRFToken": csrftoken }, credentials: "same-origin" }).catch(()=>{});
+    }
+
+    window.addEventListener("load", () => {
+      const id = "{{ biz.id }}";
+      fetch(`/finder/business/${id}/track/view/`, {
+        method: "POST",
+        headers: { "X-CSRFToken": csrftoken },
+        credentials: "same-origin"
+      }).catch(()=>{});
+    });
+  </script>
+</body>
+</html>

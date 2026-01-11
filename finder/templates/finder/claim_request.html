@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Claim {{ biz.name }} • Nearify</title>
+
+  <style>
+    :root{
+      --primary:#4f46e5; --primary-dark:#4338ca;
+      --bg:#f4f6f8; --card:#fff; --muted:#6b7280;
+      --radius:14px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui;background:var(--bg);color:#111}
+    .wrap{max-width:720px;margin:28px auto;padding:0 16px}
+    .card{background:var(--card);border-radius:var(--radius);box-shadow:0 10px 24px rgba(0,0,0,.08);overflow:hidden}
+    .header{padding:18px;border-bottom:1px solid #eee}
+    .header h1{margin:0 0 6px 0;font-size:22px}
+    .header p{margin:0;color:var(--muted);line-height:1.5}
+    .content{padding:18px}
+    .row{margin:12px 0}
+    label{display:block;font-weight:800;margin-bottom:6px}
+    input{
+      width:100%;padding:12px 12px;border-radius:10px;border:1px solid #d1d5db;
+      font-size:15px
+    }
+    .hint{color:var(--muted);font-size:13px;margin-top:6px}
+    .btn{
+      border:none;border-radius:10px;padding:12px 14px;cursor:pointer;
+      background:var(--primary);color:#fff;font-weight:800;text-decoration:none;display:inline-block
+    }
+    .btn:hover{background:var(--primary-dark)}
+    .btn.light{background:#e5e7eb;color:#111}
+    .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .msg{
+      background:#eef2ff;border:1px solid #c7d2fe;color:#1e3a8a;
+      padding:10px 12px;border-radius:12px;margin-bottom:14px
+    }
+    .err{
+      background:#fee2e2;border:1px solid #fecaca;color:#991b1b;
+      padding:10px 12px;border-radius:12px;margin-bottom:14px
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <a href="{% url 'business_detail' biz.id %}" style="color:var(--muted);text-decoration:none;">← Back to business</a>
+
+    <div class="card" style="margin-top:12px;">
+      <div class="header">
+        <h1>Claim “{{ biz.name }}”</h1>
+        {% if website_domain %}
+          <p>
+            To prove you own this business, enter an email on the business domain:
+            <b>@{{ website_domain }}</b>. We’ll send you a 6-digit code.
+          </p>
+        {% else %}
+          <p>
+            This business has no website domain saved, so we can’t auto-verify by email domain.
+            You can add a website URL to the listing or contact support for manual review.
+          </p>
+        {% endif %}
+      </div>
+
+      <div class="content">
+
+        {% if messages %}
+          {% for message in messages %}
+            {% if message.tags == "error" %}
+              <div class="err">{{ message }}</div>
+            {% else %}
+              <div class="msg">{{ message }}</div>
+            {% endif %}
+          {% endfor %}
+        {% endif %}
+
+        <form method="post">
+          {% csrf_token %}
+
+          <div class="row">
+            <label for="email">Business email</label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              placeholder="you@{{ website_domain|default:'yourdomain.com' }}"
+              required
+              {% if not website_domain %}disabled{% endif %}
+            />
+            <div class="hint">
+              Must end with <b>@{{ website_domain|default:"yourdomain.com" }}</b>.
+              (Example: hello@{{ website_domain|default:"yourdomain.com" }})
+            </div>
+          </div>
+
+          <div class="btnrow">
+            <button class="btn" type="submit" {% if not website_domain %}disabled{% endif %}>
+              Send verification code
+            </button>
+            <a class="btn light" href="{% url 'search_business' %}">
+              Cancel
+            </a>
+          </div>
+
+        </form>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Nearify</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    :root {
+      --primary: #4f46e5;
+      --primary-dark: #4338ca;
+      --bg: #f4f6f8;
+      --card-bg: #ffffff;
+      --text-dark: #111;
+      --text-muted: #6b7280;
+      --border-radius: 10px;
+      --shadow: 0 8px 20px rgba(0,0,0,0.08);
+      --border: #e5e7eb;
+      --soft: #f9fafb;
+    }
+
+    [data-theme="dark"] {
+      --bg: #0f172a;
+      --card-bg: #020617;
+      --text-dark: #e5e7eb;
+      --text-muted: #94a3b8;
+      --border: #1f2937;
+      --soft: #0b1220;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text-dark);
+      line-height: 1.5;
+    }
+
+    .theme-toggle {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      font-size: 18px;
+      background: var(--card-bg);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .wrapper {
+      max-width: 900px;
+      margin: 32px auto;
+      padding: 0 16px;
+    }
+
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      padding:14px 16px;
+      margin-bottom:18px;
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+
+    .brand{
+      font-weight:900;
+      letter-spacing:.2px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-size: 16px;
+    }
+    .brand span{
+      color: var(--primary);
+      font-size:18px;
+    }
+
+    .navlinks{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+      align-items:center;
+    }
+
+    .navlinks a{
+      text-decoration:none;
+      font-weight:900;
+      color: var(--primary);
+    }
+
+    .navlinks .btn-link{
+      background: var(--primary);
+      color: #fff;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-weight:900;
+      border:none;
+      cursor:pointer;
+      text-decoration:none;
+      display:inline-block;
+    }
+
+    .navlinks .btn-link:hover{ background: var(--primary-dark); }
+
+    .featured-section {
+      background: #fffbe6;
+      border-radius: var(--border-radius);
+      padding: 22px;
+      margin-bottom: 22px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(0,0,0,0.04);
+    }
+    [data-theme="dark"] .featured-section{
+      background: rgba(250, 204, 21, 0.10);
+      border: 1px solid rgba(250, 204, 21, 0.18);
+    }
+
+    .featured-card {
+      display: block;
+      padding: 16px;
+      border-left: 5px solid gold;
+      border-radius: var(--border-radius);
+      background: var(--card-bg);
+      margin-bottom: 12px;
+      text-decoration: none;
+      color: inherit;
+      border: 1px solid var(--border);
+    }
+
+    .badge {
+      background: gold;
+      color: #111;
+      font-size: 12px;
+      padding: 2px 8px;
+      border-radius: 6px;
+      margin-left: 6px;
+      font-weight: 900;
+    }
+
+    .pill{
+      display:inline-block;
+      font-size:12px;
+      padding:2px 8px;
+      border-radius:999px;
+      margin-left:8px;
+      font-weight:900;
+      background:#fee2e2;
+      color:#991b1b;
+    }
+
+    .search-card {
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      padding: 26px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+
+    h1, h2 { text-align: center; margin: 0 0 16px 0; }
+
+    form.search-form {
+      display: flex;
+      gap: 10px;
+      margin: 18px 0 24px;
+    }
+
+    input {
+      flex: 1;
+      padding: 12px;
+      font-size: 15px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--text-dark);
+    }
+    input::placeholder { color: var(--text-muted); }
+
+    button {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      background: var(--primary);
+      color: white;
+      cursor: pointer;
+      font-weight: 900;
+    }
+
+    button:hover { background: var(--primary-dark); }
+
+    ul { list-style: none; padding: 0; margin: 0; }
+
+    li {
+      background: var(--soft);
+      border-radius: var(--border-radius);
+      padding: 16px;
+      margin-bottom: 14px;
+      border-left: 5px solid var(--primary);
+      border: 1px solid var(--border);
+    }
+
+    .business-name { font-size: 18px; font-weight: 1000; }
+    .rating { color: #f59e0b; font-size: 14px; margin-top:4px; }
+    .meta { font-size: 14px; color: var(--text-muted); margin-top:6px; }
+    .empty { text-align: center; color: var(--text-muted); padding: 14px 0; }
+
+    .upgrade-btn {
+      background:#fbbf24;
+      color:#111;
+      padding:8px 12px;
+      border:none;
+      border-radius:10px;
+      font-size:12px;
+      cursor:pointer;
+      margin-top:8px;
+      font-weight:1000;
+      text-decoration:none;
+      display:inline-block;
+      line-height: 1;
+    }
+
+    .claim-btn{ background:#111; color:#fff; }
+
+    .actions-row{
+      margin-top:10px;
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .tiny-note{
+      margin-top:8px;
+      font-size:12px;
+      color: var(--text-muted);
+    }
+
+    .card-link{
+      text-decoration:none;
+      color:inherit;
+      display:block;
+    }
+
+    @media (max-width: 600px) {
+      form.search-form { flex-direction: column; }
+    }
+  </style>
+</head>
+
+<body>
+  <button id="themeToggle" class="theme-toggle" type="button">🌙</button>
+
+  <div class="wrapper">
+
+    <div class="topbar">
+      <div class="brand"><span>📍</span> Nearify</div>
+
+      <div class="navlinks">
+        {% if user.is_authenticated %}
+          <a href="{% url 'dashboard' %}">📌 Dashboard</a>
+          <a class="btn-link" href="{% url 'add_business' %}">➕ Add business</a>
+
+          <form method="post" action="{% url 'logout' %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn-link" style="background:#111;">Logout</button>
+          </form>
+        {% else %}
+          <a href="/accounts/login/">Login</a>
+          <a class="btn-link" href="/accounts/signup/">Sign up</a>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if featured %}
+      <section class="featured-section">
+        <h2>⭐ Featured Businesses</h2>
+
+        {% for biz in featured %}
+          <a href="{% url 'business_detail' biz.id %}" class="featured-card">
+            <strong>{{ biz.name }}</strong>
+            <span class="badge">{{ biz.plan|upper }}</span>
+
+            {% if biz.is_on_holiday %}
+              <span class="pill">ON HOLIDAY</span>
+            {% endif %}
+
+            <p class="meta" style="margin:8px 0 0;">
+              📍 {{ biz.address|default_if_none:"" }}, {{ biz.city|default_if_none:"" }}, {{ biz.state|default_if_none:"" }} {{ biz.zip_code|default_if_none:"" }}<br>
+              {% if biz.open_time and biz.close_time %}
+                🕒 {{ biz.open_time|time:"g:i A" }} - {{ biz.close_time|time:"g:i A" }}
+              {% endif %}
+            </p>
+          </a>
+        {% endfor %}
+      </section>
+    {% endif %}
+
+    <section class="search-card">
+      <h1>🔍 Nearify</h1>
+
+      <form method="post" class="search-form">
+        {% csrf_token %}
+        <input type="text" name="term" placeholder="Business type (e.g. salon)" required>
+        <input type="text" name="location" placeholder="Location (e.g. New York)" required>
+        <button type="submit">Search</button>
+      </form>
+
+      {% if error %}
+        <p class="empty">{{ error }}</p>
+      {% endif %}
+
+      <ul>
+        {% for b in businesses %}
+          <li>
+
+            {% if b.db_id %}
+              <!-- DB businesses go to internal detail page -->
+              <a class="card-link" href="{% url 'business_detail' b.db_id %}">
+                <div class="business-name">{{ b.name }}</div>
+
+                <div class="rating">
+                  {% for _ in b.stars.full %}★{% endfor %}
+                  {% if b.stars.half %}⯨{% endif %}
+                  {% for _ in b.stars.empty %}☆{% endfor %}
+                  ({{ b.rating|default:0 }}) • {{ b.review_count|default:0 }} reviews
+                </div>
+
+                <div class="meta">
+                  {% if b.address or b.city or b.state or b.zip_code %}
+                    📍 {{ b.address|default_if_none:"" }}, {{ b.city|default_if_none:"" }}, {{ b.state|default_if_none:"" }} {{ b.zip_code|default_if_none:"" }}
+                  {% else %}
+                    📍 {{ b.display_location|default_if_none:"" }}
+                  {% endif %}
+                </div>
+              </a>
+
+              <!-- OWNER upgrade UI (only for DB businesses) -->
+              {% if user.is_authenticated and b.owner_id == user.id %}
+                {% if not b.is_active %}
+                  <div class="actions-row">
+                    <button type="button" class="upgrade-btn"
+                      onclick="event.stopPropagation(); promoteBusiness('{{ b.db_id }}','featured')">
+                      Featured – $19.99
+                    </button>
+                    <button type="button" class="upgrade-btn"
+                      onclick="event.stopPropagation(); promoteBusiness('{{ b.db_id }}','premium')">
+                      Premium – $49.99
+                    </button>
+                    <button type="button" class="upgrade-btn"
+                      onclick="event.stopPropagation(); promoteBusiness('{{ b.db_id }}','top')">
+                      Top Slot – $99.99
+                    </button>
+                  </div>
+                {% else %}
+                  <div class="meta" style="margin-top:8px;">✅ Active: {{ b.plan|upper }}</div>
+                {% endif %}
+              {% else %}
+                <!-- NOT OWNER (DB biz): let them claim -->
+                {% if user.is_authenticated %}
+                  <div class="actions-row">
+                    <a class="upgrade-btn" href="{% url 'business_detail' b.db_id %}">View</a>
+                    <a class="upgrade-btn claim-btn" href="{% url 'claim_request' b.db_id %}">Claim &amp; Upgrade</a>
+                  </div>
+                  <div class="tiny-note">Verify ownership to unlock promotion.</div>
+                {% else %}
+                  <div class="tiny-note"><a href="/accounts/login/">Login to claim &amp; promote</a></div>
+                {% endif %}
+              {% endif %}
+
+            {% else %}
+              <!-- OSM businesses: DO NOT wrap the whole card in <a> -->
+              <div class="business-name">{{ b.name }}</div>
+
+              <div class="rating">
+                ☆☆☆☆☆ (0) • 0 reviews
+              </div>
+
+              <div class="meta">
+                {% if b.address or b.city or b.state or b.zip_code %}
+                  📍 {{ b.address|default_if_none:"" }}, {{ b.city|default_if_none:"" }}, {{ b.state|default_if_none:"" }} {{ b.zip_code|default_if_none:"" }}
+                {% else %}
+                  📍 {{ b.display_location|default_if_none:"" }}
+                {% endif %}
+              </div>
+
+              <div class="actions-row">
+                {% if b.display_phone %}
+                  <a class="upgrade-btn" href="tel:{{ b.display_phone }}">📞 Call</a>
+                {% endif %}
+
+                {% if b.url %}
+                  <a class="upgrade-btn" href="{{ b.url }}" target="_blank" rel="noopener">🌐 Website</a>
+                {% endif %}
+
+                {% if b.maps_url %}
+                  <a class="upgrade-btn" href="{{ b.maps_url }}" target="_blank" rel="noopener">🧭 Directions</a>
+                {% endif %}
+
+                {% if user.is_authenticated %}
+                  <!-- ✅ OSM Claim -> POST import to DB then redirect to claim flow -->
+                  <form method="post" action="{% url 'claim_osm_start' %}" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="osm_id" value="{{ b.osm_id|default:b.id }}">
+                    <input type="hidden" name="name" value="{{ b.name }}">
+                    <input type="hidden" name="address" value="{{ b.address }}">
+                    <input type="hidden" name="city" value="{{ b.city }}">
+                    <input type="hidden" name="state" value="{{ b.state }}">
+                    <input type="hidden" name="zip_code" value="{{ b.zip_code }}">
+                    <input type="hidden" name="phone" value="{{ b.display_phone }}">
+                    <input type="hidden" name="url" value="{{ b.url }}">
+                    <input type="hidden" name="category" value="{{ b.category|default_if_none:'' }}">
+                    <button type="submit" class="upgrade-btn claim-btn">Claim &amp; Upgrade</button>
+                  </form>
+                {% else %}
+                  <a class="upgrade-btn claim-btn" href="/accounts/login/">Login to claim</a>
+                {% endif %}
+              </div>
+
+              <div class="tiny-note">
+                Claim requires a website email on the same domain (example: name@business.com).
+              </div>
+            {% endif %}
+
+          </li>
+        {% empty %}
+          <p class="empty">No results yet.</p>
+        {% endfor %}
+      </ul>
+
+    </section>
+  </div>
+
+  <script src="https://js.stripe.com/v3/"></script>
+  <script>
+    // ---- Dark mode toggle (persists) ----
+    const themeToggle = document.getElementById("themeToggle");
+
+    function setTheme(mode) {
+      if (mode === "dark") {
+        document.documentElement.setAttribute("data-theme", "dark");
+        themeToggle.textContent = "☀️";
+      } else {
+        document.documentElement.removeAttribute("data-theme");
+        themeToggle.textContent = "🌙";
+      }
+      localStorage.setItem("nearify_theme", mode);
+    }
+
+    const saved = localStorage.getItem("nearify_theme");
+    setTheme(saved || "light");
+
+    themeToggle.addEventListener("click", () => {
+      const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+      setTheme(isDark ? "light" : "dark");
+    });
+
+    // ---- Stripe checkout ----
+    const stripe = Stripe('{{ STRIPE_PUBLISHABLE_KEY }}');
+
+    function promoteBusiness(businessId, plan) {
+      fetch(`/finder/stripe/create-checkout-session/${businessId}/${plan}/`, { credentials: "same-origin" })
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.id) return stripe.redirectToCheckout({ sessionId: data.id });
+        })
+        .catch(() => {});
+    }
+  </script>
+</body>
+</html>

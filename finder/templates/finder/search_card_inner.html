@@ -1,0 +1,109 @@
+{% comment %}
+Expects variables:
+- b (business dict)
+- is_active (bool)
+- plan (string)
+{% endcomment %}
+
+{% if b.db_id %}
+  <a href="{% url 'business_detail' b.db_id %}" style="text-decoration:none; color:inherit; display:block;">
+{% else %}
+  <a href="{{ b.url|default:'#' }}" target="_blank" rel="noopener" style="text-decoration:none; color:inherit; display:block;">
+{% endif %}
+
+  <div class="business-name">
+    {{ b.name|default:"Unknown" }}
+    {% if is_active %}
+      <span class="badge">{{ plan|upper }}</span>
+    {% else %}
+      <span class="pill pill-muted">FREE</span>
+    {% endif %}
+  </div>
+
+  <div class="rating">
+    {% for _ in b.stars.full %}★{% endfor %}
+    {% if b.stars.half %}⯨{% endif %}
+    {% for _ in b.stars.empty %}☆{% endfor %}
+    ({{ b.rating|default:0 }}) • {{ b.review_count|default:0 }} reviews
+  </div>
+
+  <div class="meta">
+    {% if b.address or b.city or b.state or b.zip_code %}
+      📍 {{ b.address|default_if_none:"" }}, {{ b.city|default_if_none:"" }}, {{ b.state|default_if_none:"" }} {{ b.zip_code|default_if_none:"" }}
+    {% else %}
+      📍 {{ b.display_location|default_if_none:"" }}
+    {% endif %}
+  </div>
+
+</a>
+
+{% if user.is_authenticated %}
+
+  {# OWNER tools #}
+  {% if b.db_id and b.owner_id == user.id %}
+
+    <div class="actions-row">
+      <button type="button" class="upgrade-btn"
+        onclick="event.stopPropagation(); promoteBusiness('{{ b.db_id }}','featured')">
+        Featured – $19.99
+      </button>
+      <button type="button" class="upgrade-btn"
+        onclick="event.stopPropagation(); promoteBusiness('{{ b.db_id }}','premium')">
+        Premium – $49.99
+      </button>
+      <button type="button" class="upgrade-btn"
+        onclick="event.stopPropagation(); promoteBusiness('{{ b.db_id }}','top')">
+        Top Slot – $99.99
+      </button>
+
+      <a class="upgrade-btn btn-outline"
+         href="{% url 'edit_business' b.db_id %}"
+         onclick="event.stopPropagation();">
+        Edit
+      </a>
+    </div>
+
+    {% if is_active %}
+      <div class="meta" style="margin-top:6px;">
+        ✅ Active: {{ plan|upper }}
+        {% if b.featured_until %} • until {{ b.featured_until }}{% endif %}
+      </div>
+    {% endif %}
+
+  {# NOT OWNER tools #}
+  {% else %}
+    {% if b.db_id %}
+
+      {% if b.owner_id %}
+        <div class="actions-row">
+          <a class="upgrade-btn btn-outline" href="{% url 'business_detail' b.db_id %}" onclick="event.stopPropagation();">
+            View business
+          </a>
+          <span class="meta">🔒 Already claimed</span>
+        </div>
+      {% else %}
+        <div class="actions-row">
+          <a class="upgrade-btn btn-outline" href="{% url 'business_detail' b.db_id %}" onclick="event.stopPropagation();">
+            View business
+          </a>
+
+          <a class="upgrade-btn claim-btn"
+             href="{% url 'claim_request' b.db_id %}"
+             onclick="event.stopPropagation();">
+            Claim &amp; Upgrade
+          </a>
+        </div>
+
+        <div class="meta" style="margin-top:6px;">
+          Verify ownership to unlock promotion (Featured/Premium/Top).
+        </div>
+      {% endif %}
+
+    {% endif %}
+  {% endif %}
+
+{% else %}
+  <div style="margin-top:8px;">
+    <a href="/accounts/login/">Login to claim &amp; promote</a>
+  </div>
+{% endif %}
