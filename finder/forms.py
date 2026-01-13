@@ -1,6 +1,8 @@
 # finder/forms.py
 from django import forms
 from .models import FeaturedBusiness
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.models import User
 
 
 class ManualBusinessForm(forms.ModelForm):
@@ -102,3 +104,17 @@ class EditBusinessForm(forms.ModelForm):
 
             "holiday_note": forms.TextInput(attrs={"placeholder": "Holiday note (optional)"}),
         }
+
+
+
+
+
+
+
+
+class SignUpForm(UserCreationForm):
+    email = forms.EmailField(required=True)
+
+    class Meta:
+        model = User
+        fields = ("username", "email", "password1", "password2")
